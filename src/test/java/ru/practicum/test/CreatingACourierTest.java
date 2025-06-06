@@ -29,21 +29,25 @@ public class CreatingACourierTest {
 
     //Курьера можно создать
     //Запрос возвращает правильный код ответа
+    //Успешный запрос возвращает в теле ответа ok: true
     @Test
-    @DisplayName("Courier Can Be Created")
-    @Description("The test checks the creation of the courier")
+    @DisplayName("Courier Can Be Created. A successful request returns ok: true in the response body")
+    @Description("The test checks the creation of the courier. When all required fields are passed in the request to " +
+            "create a courier, a response with the body ok: true is returned")
     public void CourierCanBeCreatedTest() {
         //1. Отправить запрос на создание курьера
         Response response = sendPostRequestToCreateACourier();
         //2. Проверить, что ответ возвращает с кодом 201 Created
         theResponseIsReturnedWithCode201Created(response);
-        //3. Вывести тело ответа на экран
+        //3. Проверить сообщение в теле успешного запроса
+        checkTheMessageInTheResponseBody(response);
+        //4. Вывести тело ответа на экран
         printTheResponseBodyToTheScreen(response);
     }
 
 
     //Нельзя создать двух одинаковых курьеров
-    //Запрос возвращает правильный код ответа
+    //Запрос возвращает правильные код ответа и сообщение в теле
     @Test
     @DisplayName("Duplicate courier entries are not permitted")
     @Description("When creating a request with a duplicate username, the message \"This username is already in use\" is " +
@@ -57,11 +61,13 @@ public class CreatingACourierTest {
         Response duplicateResponse = sendPostRequestToCreateACourier();
         //4. Проверить, что ответ возвращается с кодом 409 Conflict
         theResponseIsReturnedWithCode409Conflict(duplicateResponse);
+        //5. Проверить сообщение в теле ответа на запрос с повторяющимся логином
+        checkTheMessageInTheResponseBodyForARequestWithADuplicateLogin(duplicateResponse);
     }
 
 
     //Чтобы создать курьера, нужно передать в ручку все обязательные поля
-    //Запрос возвращает правильный код ответа
+    //Запрос возвращает правильные код ответа и сообщение в теле
     @Test
     @DisplayName("Сourier is not created without login")
     @Description("if you pass an empty value instead of the login field, the courier will not be created")
@@ -69,12 +75,14 @@ public class CreatingACourierTest {
         //1. Создать объект класса Courier со значением поля Логин null
         courier = new Courier(null, "1234");
         //2. Отправить запрос на создание курьера с пустым полем Логин
-        checkMissingFieldFails(courier);
+        Response response = checkMissingFieldFails(courier);
+        //3. Проверить сообщение в теле ответа на запрос без одного из обязательных полей
+        checkTheMessageInTheRequestBodyWithoutLoginOrPassword(response);
     }
 
 
     //Чтобы создать курьера, нужно передать в ручку все обязательные поля
-    //Запрос возвращает правильный код ответа
+    //Запрос возвращает правильные код ответа и сообщение в теле
     @Test
     @DisplayName("Сourier is not created without password")
     @Description("if you pass an empty value instead of the password field, the courier will not be created")
@@ -82,65 +90,9 @@ public class CreatingACourierTest {
         //1. Создать объект класса Courier со значением поля Пароль null
         courier = new Courier("spider-man", null);
         //2. Отправить запрос на создание курьера с пустым полем Пароль
-        checkMissingFieldFails(courier);
-    }
-
-
-    //Успешный запрос возвращает в теле ответа ok: true
-    @Test
-    @DisplayName("A successful request returns ok: true in the response body")
-    @Description("When all required fields are passed in the request to create a courier, a response with the body " +
-            "ok: true is returned")
-    public void successfulRequestReturnsOKTest() {
-        //1. Отправить запрос на создание курьера
-        Response response = sendPostRequestToCreateACourier();
-        //2. Проверить сообщение в теле успешного запроса
-        checkTheMessageInTheResponseBody(response);
-    }
-
-
-    //Если одного из полей нет, запрос возвращает ошибку
-    @Test
-    @DisplayName("Error if login is not passed")
-    @Description("If one of the fields is missing, the request returns the error \"Not enough data to create an " +
-            "account\"")
-    public void errorIfLoginIsNotPassedTest() {
-        //1. Создать объект класса Courier со значением поля Логин null
-        courier = new Courier(null, "1234");
-        //2. Отправить запрос на создание курьера с пустым полем Логин
         Response response = checkMissingFieldFails(courier);
         //3. Проверить сообщение в теле ответа на запрос без одного из обязательных полей
         checkTheMessageInTheRequestBodyWithoutLoginOrPassword(response);
-    }
-
-    //Если одного из полей нет, запрос возвращает ошибку
-    @Test
-    @DisplayName("Error if password not passed")
-    @Description("If one of the fields is missing, the request returns the error \"Not enough data to create an " +
-            "account\"")
-    public void errorIfPasswordNotPassedTest() {
-        //1. Создать объект класса Courier со значением поля Пароль null
-        courier = new Courier("spider-man", null);
-        //2. Отправить запрос на создание курьера с пустым полем Пароль
-        Response response = checkMissingFieldFails(courier);
-        //3. Проверить сообщение в теле ответа на запрос без одного из обязательных полей
-        checkTheMessageInTheRequestBodyWithoutLoginOrPassword(response);
-    }
-
-    //Если создать пользователя с логином, который уже есть, возвращается ошибка
-    @Test
-    @DisplayName("Error when creating identical couriers")
-    @Description("If you create a user with a login that already exists, the error \"This login is already in use\" " +
-            "is returned\"")
-    public void errorWhenCreatingIdenticalCouriersTest() {
-        //1. Отправить запрос на создание курьера
-        Response response = sendPostRequestToCreateACourier();
-        //2. Проверить, что ответ возвращается с кодом 201 Created
-        theResponseIsReturnedWithCode201Created(response);
-        //3. Отправить повторный запрос на создание курьера с теми же параметрами
-        Response duplicateResponse = sendPostRequestToCreateACourier();
-        //4. Проверить сообщение об ошибке в теле ответа
-        checkTheMessageInTheResponseBodyForARequestWithADuplicateLogin(duplicateResponse);
     }
 
 

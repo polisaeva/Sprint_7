@@ -23,7 +23,7 @@ public class ListOfOrdersTest {
                 .spec(ApiSpec.getBaseSpec())
                 .when()
                 .get(Endpoints.ORDER);
-        //2. Получить код ответа и убедить в том, что список возвращается не пустой
+        //2. Получить код ответа и убедиться в том, что список возвращается не пустой
         response.then().statusCode(200).body("orders", notNullValue());
     }
 }
