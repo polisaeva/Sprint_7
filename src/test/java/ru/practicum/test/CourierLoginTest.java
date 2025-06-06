@@ -50,8 +50,6 @@ public class CourierLoginTest {
         checkThatTheCodeReturnedIs200(response);
         //3. Вывести тело ответа на экран
         printTheResponseBodyOnTheScreen(response);
-        //4. Получить id курьера
-        courierId = getCourierId(response);
     }
 
     //Успешный запрос возвращает id
@@ -63,8 +61,6 @@ public class CourierLoginTest {
         Response response = sendARequestForACourierLoginInTheSystem();
         //2. Проверить наличие ключа id в теле ответа
         response.then().assertThat().body("id", notNullValue());
-        //3. Получить id курьера
-        courierId = getCourierId(response);
     }
 
     //Для авторизации нужно передать все обязательные поля
@@ -285,7 +281,7 @@ public class CourierLoginTest {
 
         // Если код ответа 200, то получаем ID курьера и удаляем его из системы
         if (loginResponse.statusCode() == 200) {
-            courierId = loginResponse.then().extract().path("id");
+            courierId = getCourierId(loginResponse);
             given()
                     .spec(ApiSpec.getBaseSpec())
                     .when()
