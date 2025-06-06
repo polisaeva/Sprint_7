@@ -10,6 +10,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import ru.practicum.ApiSpec;
+import ru.practicum.Endpoints;
 import ru.practicum.Order;
 
 import java.util.Arrays;
@@ -86,7 +87,7 @@ public class CreateAnOrderTest {
                 .spec(ApiSpec.getBaseSpec())
                 .body(order)
                 .when()
-                .post("/api/v1/orders");
+                .post(Endpoints.ORDER);
         return response;
     }
 
@@ -108,7 +109,7 @@ public class CreateAnOrderTest {
                     .spec(ApiSpec.getBaseSpec())
                     .queryParam("track", getOrderNumber)
                     .when()
-                    .put("/api/v1/orders/cancel")
+                    .put(Endpoints.CANSEL_ORDER)
                     .then()
                     .statusCode(200);
         }

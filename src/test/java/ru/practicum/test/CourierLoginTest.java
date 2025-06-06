@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 import ru.practicum.ApiSpec;
 import ru.practicum.Courier;
+import ru.practicum.Endpoints;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -31,7 +32,7 @@ public class CourierLoginTest {
                 .spec(ApiSpec.getBaseSpec())
                 .body(courier)
                 .when()
-                .post("/api/v1/courier")
+                .post(Endpoints.COURIER)
                 .then()
                 .statusCode(201);
     }
@@ -169,7 +170,7 @@ public class CourierLoginTest {
                 .spec(ApiSpec.getBaseSpec())
                 .body(courier)
                 .when()
-                .post("/api/v1/courier/login");
+                .post(Endpoints.COURIER_LOGIN);
         return responseLogin;
     }
 
@@ -202,7 +203,7 @@ public class CourierLoginTest {
                 .spec(ApiSpec.getBaseSpec())
                 .body(new Courier(null, "1234"))
                 .when()
-                .post("/api/v1/courier/login");
+                .post(Endpoints.COURIER_LOGIN);
         return response;
     }
 
@@ -214,7 +215,7 @@ public class CourierLoginTest {
                 .spec(ApiSpec.getBaseSpec())
                 .body(new Courier("spider-man", null))
                 .when()
-                .post("/api/v1/courier/login");
+                .post(Endpoints.COURIER_LOGIN);
         return response;
     }
 
@@ -240,7 +241,7 @@ public class CourierLoginTest {
                 .spec(ApiSpec.getBaseSpec())
                 .body(new Courier("piter-parker", "1234"))
                 .when()
-                .post("/api/v1/courier/login");
+                .post(Endpoints.COURIER_LOGIN);
         return response;
     }
 
@@ -252,7 +253,7 @@ public class CourierLoginTest {
                 .spec(ApiSpec.getBaseSpec())
                 .body(new Courier("spider-man", "4321"))
                 .when()
-                .post("/api/v1/courier/login");
+                .post(Endpoints.COURIER_LOGIN);
         return response;
     }
 
@@ -280,7 +281,7 @@ public class CourierLoginTest {
                 .spec(ApiSpec.getBaseSpec())
                 .body(courier)
                 .when()
-                .post("/api/v1/courier/login");
+                .post(Endpoints.COURIER_LOGIN);
 
         // Если код ответа 200, то получаем ID курьера и удаляем его из системы
         if (loginResponse.statusCode() == 200) {
@@ -288,7 +289,7 @@ public class CourierLoginTest {
             given()
                     .spec(ApiSpec.getBaseSpec())
                     .when()
-                    .delete("/api/v1/courier/" + courierId)
+                    .delete(Endpoints.COURIER_DELETE + courierId)
                     .then()
                     .statusCode(200);
         } else {
