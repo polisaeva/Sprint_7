@@ -2,13 +2,14 @@ package ru.practicum.test;
 
 
 import io.qameta.allure.Step;
-import io.restassured.RestAssured;
+
 import io.restassured.response.Response;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import ru.practicum.ApiSpec;
 import ru.practicum.Order;
 
 import java.util.Arrays;
@@ -52,7 +53,6 @@ public class CreateAnOrderTest {
 
     @Before
     public void setUp() {
-        RestAssured.baseURI = "https://qa-scooter.praktikum-services.ru/";
         order = new Order(
                 "Gwen",
                 "Stacy",
@@ -83,7 +83,7 @@ public class CreateAnOrderTest {
     @Step("Send a request to create an order")
     public Response sendARequestToCreateAnOrder() {
         Response response = given()
-                .header("Content-type", "application/json")
+                .spec(ApiSpec.getBaseSpec())
                 .body(order)
                 .when()
                 .post("/api/v1/orders");
@@ -105,7 +105,7 @@ public class CreateAnOrderTest {
         //Отменяем заказ
         if (expectedStatusCode == 201) {
             given()
-                    .header("Content-type", "application/json")
+                    .spec(ApiSpec.getBaseSpec())
                     .queryParam("track", getOrderNumber)
                     .when()
                     .put("/api/v1/orders/cancel")

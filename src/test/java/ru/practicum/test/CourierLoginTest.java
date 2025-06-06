@@ -3,11 +3,12 @@ package ru.practicum.test;
 import io.qameta.allure.Description;
 import io.qameta.allure.Step;
 import io.qameta.allure.junit4.DisplayName;
-import io.restassured.RestAssured;
+
 import io.restassured.response.Response;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import ru.practicum.ApiSpec;
 import ru.practicum.Courier;
 
 import static io.restassured.RestAssured.given;
@@ -24,10 +25,10 @@ public class CourierLoginTest {
 
     @Before
     public void setUp() {
-        RestAssured.baseURI = "https://qa-scooter.praktikum-services.ru/";
+
         courier = new Courier(login, password);
         given()
-                .header("Content-type", "application/json")
+                .spec(ApiSpec.getBaseSpec())
                 .body(courier)
                 .when()
                 .post("/api/v1/courier")
@@ -165,7 +166,7 @@ public class CourierLoginTest {
     @Step("Send a request for a courier login in the system")
     public Response sendARequestForACourierLoginInTheSystem() {
         Response responseLogin = given()
-                .header("Content-type", "application/json")
+                .spec(ApiSpec.getBaseSpec())
                 .body(courier)
                 .when()
                 .post("/api/v1/courier/login");
@@ -198,7 +199,7 @@ public class CourierLoginTest {
     @Step("Send request without login")
     public Response sendRequestWithoutLogin() {
         Response response = given()
-                .header("Content-type", "application/json")
+                .spec(ApiSpec.getBaseSpec())
                 .body(new Courier(null, "1234"))
                 .when()
                 .post("/api/v1/courier/login");
@@ -210,7 +211,7 @@ public class CourierLoginTest {
     @Step("Send request without password")
     public Response sendRequestWithoutPassword() {
         Response response = given()
-                .header("Content-type", "application/json")
+                .spec(ApiSpec.getBaseSpec())
                 .body(new Courier("spider-man", null))
                 .when()
                 .post("/api/v1/courier/login");
@@ -236,7 +237,7 @@ public class CourierLoginTest {
     @Step("Send request with incorrect login")
     public Response sendRequestWithIncorrectLogin() {
         Response response = given()
-                .header("Content-type", "application/json")
+                .spec(ApiSpec.getBaseSpec())
                 .body(new Courier("piter-parker", "1234"))
                 .when()
                 .post("/api/v1/courier/login");
@@ -248,7 +249,7 @@ public class CourierLoginTest {
     @Step("Send request with incorrect password")
     public Response sendRequestWithIncorrectPassword() {
         Response response = given()
-                .header("Content-type", "application/json")
+                .spec(ApiSpec.getBaseSpec())
                 .body(new Courier("spider-man", "4321"))
                 .when()
                 .post("/api/v1/courier/login");
@@ -276,7 +277,7 @@ public class CourierLoginTest {
     public void cleanUp() {
         // Логин курьера в системе
         Response loginResponse = given()
-                .header("Content-type", "application/json")
+                .spec(ApiSpec.getBaseSpec())
                 .body(courier)
                 .when()
                 .post("/api/v1/courier/login");
@@ -285,6 +286,7 @@ public class CourierLoginTest {
         if (loginResponse.statusCode() == 200) {
             courierId = loginResponse.then().extract().path("id");
             given()
+                    .spec(ApiSpec.getBaseSpec())
                     .when()
                     .delete("/api/v1/courier/" + courierId)
                     .then()

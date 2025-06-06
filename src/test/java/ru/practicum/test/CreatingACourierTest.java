@@ -3,11 +3,12 @@ package ru.practicum.test;
 import io.qameta.allure.Description;
 import io.qameta.allure.Step;
 import io.qameta.allure.junit4.DisplayName;
-import io.restassured.RestAssured;
+
 import io.restassured.response.Response;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import ru.practicum.ApiSpec;
 import ru.practicum.Courier;
 
 import static io.restassured.RestAssured.given;
@@ -21,7 +22,6 @@ public class CreatingACourierTest {
 
     @Before
     public void setUp() {
-        RestAssured.baseURI = "https://qa-scooter.praktikum-services.ru/";
         courier = new Courier("spider-man", "1234");
     }
 
@@ -146,7 +146,7 @@ public class CreatingACourierTest {
     //Метод для шага "Отправить запрос на создание курьера"
     @Step("Send POST request to /api/v1/courier")
     public Response sendPostRequestToCreateACourier() {
-        Response response = given().header("Content-type", "application/json").and().body(courier).when()
+        Response response = given().spec(ApiSpec.getBaseSpec()).and().body(courier).when()
                 .post("/api/v1/courier");
         return response;
     }
@@ -184,7 +184,7 @@ public class CreatingACourierTest {
     @Step("Check missing field fails")
     public Response checkMissingFieldFails(Courier courier) {
         Response response = given()
-                .header("Content-type", "application/json")
+                .spec(ApiSpec.getBaseSpec())
                 .and()
                 .body(courier)
                 .when()
@@ -223,7 +223,7 @@ public class CreatingACourierTest {
     public void cleanUp() {
         // Логин курьера в системе
         Response loginResponse = given()
-                .header("Content-type", "application/json")
+                .spec(ApiSpec.getBaseSpec())
                 .body(courier)
                 .when()
                 .post("/api/v1/courier/login");
@@ -232,6 +232,7 @@ public class CreatingACourierTest {
         if (loginResponse.statusCode() == 200) {
             courierId = loginResponse.then().extract().path("id");
             given()
+                    .spec(ApiSpec.getBaseSpec())
                     .when()
                     .delete("/api/v1/courier/" + courierId)
                     .then()
