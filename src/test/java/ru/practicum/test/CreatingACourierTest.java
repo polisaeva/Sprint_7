@@ -32,7 +32,7 @@ public class CreatingACourierTest {
     @Test
     @DisplayName("Courier Can Be Created")
     @Description("The test checks the creation of the courier")
-    public void CourierCanBeCreated() {
+    public void CourierCanBeCreatedTest() {
         //1. Отправить запрос на создание курьера
         Response response = sendPostRequestToCreateACourier();
         //2. Проверить, что ответ возвращает с кодом 201 Created
@@ -48,7 +48,7 @@ public class CreatingACourierTest {
     @DisplayName("Duplicate courier entries are not permitted")
     @Description("When creating a request with a duplicate username, the message \"This username is already in use\" is " +
             "returned")
-    public void duplicateCourierEntriesAreNotPermitted() {
+    public void duplicateCourierEntriesAreNotPermittedTest() {
         //1. Отправить запрос на создание курьера
         Response response = sendPostRequestToCreateACourier();
         //2. Проверить, что ответ возвращается с кодом 201 Created
@@ -65,7 +65,7 @@ public class CreatingACourierTest {
     @Test
     @DisplayName("Сourier is not created without login")
     @Description("if you pass an empty value instead of the login field, the courier will not be created")
-    public void courierIsNotCreatedWithoutLogin() {
+    public void courierIsNotCreatedWithoutLoginTest() {
         //1. Создать объект класса Courier со значением поля Логин null
         courier = new Courier(null, "1234");
         //2. Отправить запрос на создание курьера с пустым полем Логин
@@ -78,7 +78,7 @@ public class CreatingACourierTest {
     @Test
     @DisplayName("Сourier is not created without password")
     @Description("if you pass an empty value instead of the password field, the courier will not be created")
-    public void courierIsNotCreatedWithoutPassword() {
+    public void courierIsNotCreatedWithoutPasswordTest() {
         //1. Создать объект класса Courier со значением поля Пароль null
         courier = new Courier("spider-man", null);
         //2. Отправить запрос на создание курьера с пустым полем Пароль
@@ -91,7 +91,7 @@ public class CreatingACourierTest {
     @DisplayName("A successful request returns ok: true in the response body")
     @Description("When all required fields are passed in the request to create a courier, a response with the body " +
             "ok: true is returned")
-    public void successfulRequestReturnsOK() {
+    public void successfulRequestReturnsOKTest() {
         //1. Отправить запрос на создание курьера
         Response response = sendPostRequestToCreateACourier();
         //2. Проверить сообщение в теле успешного запроса
@@ -104,7 +104,7 @@ public class CreatingACourierTest {
     @DisplayName("Error if login is not passed")
     @Description("If one of the fields is missing, the request returns the error \"Not enough data to create an " +
             "account\"")
-    public void errorIfLoginIsNotPassed() {
+    public void errorIfLoginIsNotPassedTest() {
         //1. Создать объект класса Courier со значением поля Логин null
         courier = new Courier(null, "1234");
         //2. Отправить запрос на создание курьера с пустым полем Логин
@@ -118,7 +118,7 @@ public class CreatingACourierTest {
     @DisplayName("Error if password not passed")
     @Description("If one of the fields is missing, the request returns the error \"Not enough data to create an " +
             "account\"")
-    public void errorIfPasswordNotPassed() {
+    public void errorIfPasswordNotPassedTest() {
         //1. Создать объект класса Courier со значением поля Пароль null
         courier = new Courier("spider-man", null);
         //2. Отправить запрос на создание курьера с пустым полем Пароль
@@ -132,7 +132,7 @@ public class CreatingACourierTest {
     @DisplayName("Error when creating identical couriers")
     @Description("If you create a user with a login that already exists, the error \"This login is already in use\" " +
             "is returned\"")
-    public void errorWhenCreatingIdenticalCouriers() {
+    public void errorWhenCreatingIdenticalCouriersTest() {
         //1. Отправить запрос на создание курьера
         Response response = sendPostRequestToCreateACourier();
         //2. Проверить, что ответ возвращается с кодом 201 Created

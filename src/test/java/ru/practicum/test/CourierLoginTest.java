@@ -43,7 +43,7 @@ public class CourierLoginTest {
     @Test
     @DisplayName("The courier can log in")
     @Description("Upon successful authorization, code 200 is returned")
-    public void theCourierCanLogIn() {
+    public void theCourierCanLogInTest() {
         //1. Отправить запрос логина курьера в системе
         Response response = sendARequestForACourierLoginInTheSystem();
         //2. Проверить, что возвращается код 200
@@ -58,7 +58,7 @@ public class CourierLoginTest {
     @Test
     @DisplayName("A successful request returns id")
     @Description("The body of the request for successful login returns ID")
-    public void successfulRequestReturnsId(){
+    public void successfulRequestReturnsIdTest(){
         //1. Отправить запрос логина курьера в системе
         Response response = sendARequestForACourierLoginInTheSystem();
         //2. Проверить наличие ключа id в теле ответа
@@ -72,7 +72,7 @@ public class CourierLoginTest {
     @Test
     @DisplayName("Request without login")
     @Description("To authorize, you must submit all required fields")
-    public void requestWithoutLoginReturnsCode404() {
+    public void requestWithoutLoginReturnsCode404Test() {
         //1. Отправить запрос без логина
         Response response = sendRequestWithoutLogin();
         //2. Проверить код ошибки для запроса без логина
@@ -85,7 +85,7 @@ public class CourierLoginTest {
     @Test
     @DisplayName("Request without password")
     @Description("To authorize, you must submit all required fields")
-    public void requestWithoutPasswordReturnsCode404() {
+    public void requestWithoutPasswordReturnsCode404Test() {
         //1. Отправить запрос без пароля
         Response response = sendRequestWithoutPassword();
         //2. Проверить код ошибки для запроса без пароля
@@ -98,7 +98,7 @@ public class CourierLoginTest {
     @Test
     @DisplayName("Request without login")
     @Description("To authorize, you must submit all required fields")
-    public void messageAccountNotFoundIfRequestWithoutLogin() {
+    public void messageAccountNotFoundIfRequestWithoutLoginTest() {
         //1. Отправить запрос без логина
         Response response = sendRequestWithoutLogin();
         //2. Проверить текст ошибки для запроса без логина
@@ -111,7 +111,7 @@ public class CourierLoginTest {
     @Test
     @DisplayName("Request without password")
     @Description("To authorize, you must submit all required fields")
-    public void messageAccountNotFoundIfRequestWithoutPassword() {
+    public void messageAccountNotFoundIfRequestWithoutPasswordTest() {
         //1. Отправить запрос без пароля
         Response response = sendRequestWithoutPassword();
         //2. Проверить текст ошибки для запроса без пароля
@@ -122,7 +122,7 @@ public class CourierLoginTest {
     @Test
     @DisplayName("Code 404 when requesting with non-existent login")
     @Description("An error with code 404 will be returned if the login is specified incorrectly")
-    public void code404WhenRequestingWithNonExistentLogin() {
+    public void code404WhenRequestingWithNonExistentLoginTest() {
         //1. Отправить запрос с несуществующим логином
         Response response = sendRequestWithIncorrectLogin();
         //2. Проверить код ответа для запроса с несуществующей парой логин-пароль
@@ -133,7 +133,7 @@ public class CourierLoginTest {
     @Test
     @DisplayName("Code 404 when requesting with non-existent password")
     @Description("An error with code 404 will be returned if the password is specified incorrectly")
-    public void code404WhenRequestingWithNonExistentPassword() {
+    public void code404WhenRequestingWithNonExistentPasswordTest() {
         //1. Отправить запрос с несуществующим паролем
         Response response = sendRequestWithIncorrectPassword();
         //2. Проверить код ответа для запроса с несуществующей парой логин-пароль
@@ -144,7 +144,7 @@ public class CourierLoginTest {
     @Test
     @DisplayName("Error body when requesting with non-existent login")
     @Description("If the login is incorrect, an error will be returned with the message \"Account not found\"")
-    public void errorBodyWhenRequestingWithNonExistentLogin() {
+    public void errorBodyWhenRequestingWithNonExistentLoginTest() {
         //1. Отправить запрос с несуществующим логином
         Response response = sendRequestWithIncorrectLogin();
         //2. Проверить текст ошибки для запроса с несуществующей парой логин-пароль
@@ -155,7 +155,7 @@ public class CourierLoginTest {
     @Test
     @DisplayName("Error body when requesting with non-existent password")
     @Description("If the password is incorrect, an error will be returned with the message \"Account not found\"")
-    public void errorBodyWhenRequestingWithNonExistentPassword() {
+    public void errorBodyWhenRequestingWithNonExistentPasswordTest() {
         //1. Отправить запрос с несуществующим паролем
         Response response = sendRequestWithIncorrectPassword();
         //2. Проверить текст ошибки для запроса с несуществующей парой логин-пароль

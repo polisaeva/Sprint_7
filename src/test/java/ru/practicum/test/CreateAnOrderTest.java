@@ -69,7 +69,7 @@ public class CreateAnOrderTest {
 
 
     @Test
-    public void creatingAnOrder() {
+    public void creatingAnOrderTest() {
         //1. Отправить запрос на создание заказа
         Response response = sendARequestToCreateAnOrder();
         //2. Проверить код ответа
