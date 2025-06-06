@@ -28,13 +28,8 @@ public class CourierLoginTest {
     public void setUp() {
 
         courier = new Courier(login, password);
-        given()
-                .spec(ApiSpec.getBaseSpec())
-                .body(courier)
-                .when()
-                .post(Endpoints.COURIER)
-                .then()
-                .statusCode(201);
+        Response creationResponse = courierCreation(courier);
+        creationResponse.then().statusCode(201);
     }
 
 
@@ -117,15 +112,18 @@ public class CourierLoginTest {
         checkTheErrorTextForARequestWithANonExistentLoginPasswordPair(response);
     }
 
+    //Создание курьера
+    @Step("Courier creation")
+    public Response courierCreation(Courier courier) {
+        Response creationResponse = given().spec(ApiSpec.getBaseSpec()).body(courier).when().post(Endpoints.COURIER);
+        return creationResponse;
+    }
+
 
     //Метод для шага "Отправить запрос логина курьера в системе"
     @Step("Send a request for a courier login in the system")
     public Response sendARequestForACourierLoginInTheSystem() {
-        Response responseLogin = given()
-                .spec(ApiSpec.getBaseSpec())
-                .body(courier)
-                .when()
-                .post(Endpoints.COURIER_LOGIN);
+        Response responseLogin = given().spec(ApiSpec.getBaseSpec()).body(courier).when().post(Endpoints.COURIER_LOGIN);
         return responseLogin;
     }
 
@@ -155,9 +153,7 @@ public class CourierLoginTest {
     @Step("Send request without login")
     public Response sendRequestWithoutLogin() {
         Response response = given()
-                .spec(ApiSpec.getBaseSpec())
-                .body(new Courier(null, "1234"))
-                .when()
+                .spec(ApiSpec.getBaseSpec()).body(new Courier(null, "1234")).when()
                 .post(Endpoints.COURIER_LOGIN);
         return response;
     }
@@ -166,11 +162,8 @@ public class CourierLoginTest {
     //Метод для шага "Отправить запрос без пароля"
     @Step("Send request without password")
     public Response sendRequestWithoutPassword() {
-        Response response = given()
-                .spec(ApiSpec.getBaseSpec())
-                .body(new Courier("spider-man", null))
-                .when()
-                .post(Endpoints.COURIER_LOGIN);
+        Response response = given().spec(ApiSpec.getBaseSpec()).body(new Courier("spider-man", null))
+                .when().post(Endpoints.COURIER_LOGIN);
         return response;
     }
 
@@ -192,11 +185,8 @@ public class CourierLoginTest {
     //Метод для шага "Отправить запрос с некорректным логином"
     @Step("Send request with incorrect login")
     public Response sendRequestWithIncorrectLogin() {
-        Response response = given()
-                .spec(ApiSpec.getBaseSpec())
-                .body(new Courier("piter-parker", "1234"))
-                .when()
-                .post(Endpoints.COURIER_LOGIN);
+        Response response = given().spec(ApiSpec.getBaseSpec()).body(new Courier("piter-parker", "1234"))
+                .when().post(Endpoints.COURIER_LOGIN);
         return response;
     }
 
@@ -204,11 +194,8 @@ public class CourierLoginTest {
     //Метод для шага "Отправить запрос с некорректным паролем"
     @Step("Send request with incorrect password")
     public Response sendRequestWithIncorrectPassword() {
-        Response response = given()
-                .spec(ApiSpec.getBaseSpec())
-                .body(new Courier("spider-man", "4321"))
-                .when()
-                .post(Endpoints.COURIER_LOGIN);
+        Response response = given().spec(ApiSpec.getBaseSpec()).body(new Courier("spider-man", "4321"))
+                .when().post(Endpoints.COURIER_LOGIN);
         return response;
     }
 
@@ -227,26 +214,33 @@ public class CourierLoginTest {
     }
 
 
+    // Логин курьера в системе
+    @Step("Send a request for a courier login in the system")
+    public Response sendARequestForACourierLoginInTheSystem(Courier courier) {
+        return given().spec(ApiSpec.getBaseSpec()).body(courier).when().post(Endpoints.COURIER_LOGIN);
+    }
+
+
+    //Удаление курьера из системы
+    @Step("Courier delete")
+    public Response courierDelete(int courierId) {
+        Response responseDelete = given().spec(ApiSpec.getBaseSpec()).when().delete(Endpoints.COURIER_DELETE +
+                courierId);
+        return responseDelete;
+    }
+
     @After
     //Приведение таблицы Couriers в исходное состояние
     //Запрос возвращает правильный код ответа
     public void cleanUp() {
         // Логин курьера в системе
-        Response loginResponse = given()
-                .spec(ApiSpec.getBaseSpec())
-                .body(courier)
-                .when()
-                .post(Endpoints.COURIER_LOGIN);
+        Response loginResponse = sendARequestForACourierLoginInTheSystem(courier);
 
         // Если код ответа 200, то получаем ID курьера и удаляем его из системы
         if (loginResponse.statusCode() == 200) {
             courierId = getCourierId(loginResponse);
-            given()
-                    .spec(ApiSpec.getBaseSpec())
-                    .when()
-                    .delete(Endpoints.COURIER_DELETE + courierId)
-                    .then()
-                    .statusCode(200);
+            Response responseDelete = courierDelete(courierId);
+            responseDelete.then().statusCode(200);
         } else {
             System.out.println("Курьер не найден, удаление не требуется");
         }

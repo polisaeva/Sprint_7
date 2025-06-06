@@ -83,11 +83,7 @@ public class CreateAnOrderTest {
     //Метод для шага "Отправить запрос на создание заказа"
     @Step("Send a request to create an order")
     public Response sendARequestToCreateAnOrder() {
-        Response response = given()
-                .spec(ApiSpec.getBaseSpec())
-                .body(order)
-                .when()
-                .post(Endpoints.ORDER);
+        Response response = given().spec(ApiSpec.getBaseSpec()).body(order).when().post(Endpoints.ORDER);
         return response;
     }
 
@@ -99,19 +95,22 @@ public class CreateAnOrderTest {
         return orderNumber;
     }
 
+    //Отмена заказа
+    @Step("Cancel order")
+    public Response cancelOrder() {
+        Response responseCancel = given().spec(ApiSpec.getBaseSpec()).queryParam("track", getOrderNumber).when()
+                .put(Endpoints.CANSEL_ORDER);
+        return responseCancel;
+    }
+
 
     @After
     //Удаление созданного заказа из системы
     public void cleanUp() {
         //Отменяем заказ
         if (expectedStatusCode == 201) {
-            given()
-                    .spec(ApiSpec.getBaseSpec())
-                    .queryParam("track", getOrderNumber)
-                    .when()
-                    .put(Endpoints.CANSEL_ORDER)
-                    .then()
-                    .statusCode(200);
+            Response responseCancel = cancelOrder();
+            responseCancel.then().statusCode(200);
         }
     }
 }

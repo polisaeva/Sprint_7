@@ -36,7 +36,7 @@ public class CreatingACourierTest {
             "create a courier, a response with the body ok: true is returned")
     public void CourierCanBeCreatedTest() {
         //1. Отправить запрос на создание курьера
-        Response response = sendPostRequestToCreateACourier();
+        Response response = sendPostRequestToCreateACourier(courier);
         //2. Проверить, что ответ возвращает с кодом 201 Created
         theResponseIsReturnedWithCode201Created(response);
         //3. Проверить сообщение в теле успешного запроса
@@ -54,11 +54,11 @@ public class CreatingACourierTest {
             "returned")
     public void duplicateCourierEntriesAreNotPermittedTest() {
         //1. Отправить запрос на создание курьера
-        Response response = sendPostRequestToCreateACourier();
+        Response response = sendPostRequestToCreateACourier(courier);
         //2. Проверить, что ответ возвращается с кодом 201 Created
         theResponseIsReturnedWithCode201Created(response);
         //3. Отправить повторный запрос на создание курьера с теми же параметрами
-        Response duplicateResponse = sendPostRequestToCreateACourier();
+        Response duplicateResponse = sendPostRequestToCreateACourier(courier);
         //4. Проверить, что ответ возвращается с кодом 409 Conflict
         theResponseIsReturnedWithCode409Conflict(duplicateResponse);
         //5. Проверить сообщение в теле ответа на запрос с повторяющимся логином
@@ -75,7 +75,9 @@ public class CreatingACourierTest {
         //1. Создать объект класса Courier со значением поля Логин null
         courier = new Courier(null, "1234");
         //2. Отправить запрос на создание курьера с пустым полем Логин
-        Response response = checkMissingFieldFails(courier);
+        Response response = sendPostRequestToCreateACourier(courier);
+        //3. Проверить, что ответ возвращается с кодом 400 Bad Request
+        theResponseIsReturnedWithCodeBadRequest(response);
         //3. Проверить сообщение в теле ответа на запрос без одного из обязательных полей
         checkTheMessageInTheRequestBodyWithoutLoginOrPassword(response);
     }
@@ -90,7 +92,9 @@ public class CreatingACourierTest {
         //1. Создать объект класса Courier со значением поля Пароль null
         courier = new Courier("spider-man", null);
         //2. Отправить запрос на создание курьера с пустым полем Пароль
-        Response response = checkMissingFieldFails(courier);
+        Response response = sendPostRequestToCreateACourier(courier);
+        //3. Проверить, что ответ возвращается с кодом 400 Bad Request
+        theResponseIsReturnedWithCodeBadRequest(response);
         //3. Проверить сообщение в теле ответа на запрос без одного из обязательных полей
         checkTheMessageInTheRequestBodyWithoutLoginOrPassword(response);
     }
@@ -98,7 +102,7 @@ public class CreatingACourierTest {
 
     //Метод для шага "Отправить запрос на создание курьера"
     @Step("Send POST request to /api/v1/courier")
-    public Response sendPostRequestToCreateACourier() {
+    public Response sendPostRequestToCreateACourier(Courier courier) {
         Response response = given().spec(ApiSpec.getBaseSpec()).and().body(courier).when()
                 .post(Endpoints.COURIER);
         return response;
@@ -112,6 +116,13 @@ public class CreatingACourierTest {
     }
 
 
+    //Метод для шага "Проверить сообщение в теле успешного запроса"
+    @Step("Checking the message in the response body")
+    public void checkTheMessageInTheResponseBody(Response response) {
+        response.then().assertThat().body("ok", equalTo(true));
+    }
+
+
     //Метод для шага "Вывести тело ответа на экран"
     @Step("Print the response body to the screen")
     public void printTheResponseBodyToTheScreen(Response response) {
@@ -119,38 +130,10 @@ public class CreatingACourierTest {
     }
 
 
-    //Метод для шага "Проверить, что ответ возвращается с кодом 409 Conflict"
-    @Step("Verify that the response is returned with code 409 Conflict")
-    public void theResponseIsReturnedWithCode409Conflict(Response response) {
-        response.then().statusCode(409);
-    }
-
-
     //Метод для шага "Проверить, что ответ возвращается с кодом 400 Bad Request"
     @Step("Verify that the response is returned with code 400 Bad Request")
     public void theResponseIsReturnedWithCodeBadRequest(Response response) {
         response.then().statusCode(400);
-    }
-
-
-    //Метод для шага "Проверить, что создание курьера без обязательного поля логин или пароль возвращает ошибку"
-    @Step("Check missing field fails")
-    public Response checkMissingFieldFails(Courier courier) {
-        Response response = given()
-                .spec(ApiSpec.getBaseSpec())
-                .and()
-                .body(courier)
-                .when()
-                .post(Endpoints.COURIER);
-        response.then().statusCode(400);
-        return response;
-    }
-
-
-    //Метод для шага "Проверить сообщение в теле успешного запроса"
-    @Step("Checking the message in the response body")
-    public void checkTheMessageInTheResponseBody(Response response) {
-        response.then().assertThat().body("ok", equalTo(true));
     }
 
 
@@ -162,10 +145,36 @@ public class CreatingACourierTest {
     }
 
 
+    //Метод для шага "Проверить, что ответ возвращается с кодом 409 Conflict"
+    @Step("Verify that the response is returned with code 409 Conflict")
+    public void theResponseIsReturnedWithCode409Conflict(Response response) {
+        response.then().statusCode(409);
+    }
+
+
     //Метод для шага "Проверить сообщение в теле ответа на запрос с повторяющимся логином"
     @Step("Check the message in the response body for a request with a duplicate login")
     public void checkTheMessageInTheResponseBodyForARequestWithADuplicateLogin(Response response) {
         response.then().assertThat().body("message", equalTo("Этот логин уже используется"));
+    }
+
+    // Логин курьера в системе
+    @Step("Send a request for a courier login in the system")
+    public Response sendARequestForACourierLoginInTheSystem(Courier courier) {
+        return given().spec(ApiSpec.getBaseSpec()).body(courier).when().post(Endpoints.COURIER_LOGIN);
+    }
+
+    @Step("Extract courier ID from login response")
+    public int extractCourierIdFromResponse(Response loginResponse) {
+        return loginResponse.then().extract().path("id");
+    }
+
+    //Удаление курьера из системы
+    @Step("Courier delete")
+    public Response courierDelete(int courierId) {
+        Response responseDelete = given().spec(ApiSpec.getBaseSpec()).when().delete(Endpoints.COURIER_DELETE +
+                courierId);
+        return responseDelete;
     }
 
 
@@ -175,21 +184,13 @@ public class CreatingACourierTest {
     //Запрос возвращает правильный код ответа
     public void cleanUp() {
         // Логин курьера в системе
-        Response loginResponse = given()
-                .spec(ApiSpec.getBaseSpec())
-                .body(courier)
-                .when()
-                .post(Endpoints.COURIER_LOGIN);
+        Response loginResponse = sendARequestForACourierLoginInTheSystem(courier);
 
         // Если код ответа 200, то получаем ID курьера и удаляем его из системы
         if (loginResponse.statusCode() == 200) {
-            courierId = loginResponse.then().extract().path("id");
-            given()
-                    .spec(ApiSpec.getBaseSpec())
-                    .when()
-                    .delete(Endpoints.COURIER_DELETE + courierId)
-                    .then()
-                    .statusCode(200);
+            courierId = extractCourierIdFromResponse(loginResponse);
+            Response responseDelete = courierDelete(courierId);
+            responseDelete.then().statusCode(200);
         } else {
             System.out.println("Курьер не найден, удаление не требуется");
         }
