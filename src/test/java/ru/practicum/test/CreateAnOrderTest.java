@@ -19,6 +19,7 @@ import java.util.List;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.notNullValue;
+import static ru.practicum.ApiOrder.*;
 
 
 //Создание заказа
@@ -71,7 +72,7 @@ public class CreateAnOrderTest {
     @Test
     public void creatingAnOrderTest() {
         //1. Отправить запрос на создание заказа
-        Response response = sendARequestToCreateAnOrder();
+        Response response = sendARequestToCreateAnOrder(order);
         //2. Проверить код ответа
         response.then().statusCode(expectedStatusCode);
         //3. Проверить, что в теле ответа возвращается track и получить номер заказа
@@ -80,36 +81,13 @@ public class CreateAnOrderTest {
         }
     }
 
-    //Метод для шага "Отправить запрос на создание заказа"
-    @Step("Send a request to create an order")
-    public Response sendARequestToCreateAnOrder() {
-        Response response = given().spec(ApiSpec.getBaseSpec()).body(order).when().post(Endpoints.ORDER);
-        return response;
-    }
-
-    //Метод для шага "Проверить, что в теле ответа возвращается track и получить номер заказа"
-    @Step("Track is returned in the response body")
-    public int trackIsReturnedInTheResponseBody(Response response) {
-        response.then().body("track", notNullValue());
-        int orderNumber = response.jsonPath().getInt("track");
-        return orderNumber;
-    }
-
-    //Отмена заказа
-    @Step("Cancel order")
-    public Response cancelOrder() {
-        Response responseCancel = given().spec(ApiSpec.getBaseSpec()).queryParam("track", getOrderNumber).when()
-                .put(Endpoints.CANSEL_ORDER);
-        return responseCancel;
-    }
-
 
     @After
     //Удаление созданного заказа из системы
     public void cleanUp() {
         //Отменяем заказ
         if (expectedStatusCode == 201) {
-            Response responseCancel = cancelOrder();
+            Response responseCancel = cancelOrder(getOrderNumber);
             responseCancel.then().statusCode(200);
         }
     }

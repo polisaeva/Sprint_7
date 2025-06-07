@@ -15,6 +15,7 @@ import ru.practicum.Endpoints;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static ru.practicum.ApiCourier.*;
 
 //Логин курьера
 public class CourierLoginTest {
@@ -28,7 +29,7 @@ public class CourierLoginTest {
     public void setUp() {
 
         courier = new Courier(login, password);
-        Response creationResponse = courierCreation(courier);
+        Response creationResponse = sendPostRequestToCreateACourier(courier);
         creationResponse.then().statusCode(201);
     }
 
@@ -41,13 +42,13 @@ public class CourierLoginTest {
     @Description("Upon successful authorization, code 200 is returned")
     public void theCourierCanLogInTest() {
         //1. Отправить запрос логина курьера в системе
-        Response response = sendARequestForACourierLoginInTheSystem();
+        Response response = sendARequestForACourierLoginInTheSystem(courier);
         //2. Проверить, что возвращается код 200
         checkThatTheCodeReturnedIs200(response);
         //3. Проверить наличие ключа id в теле ответа
         response.then().assertThat().body("id", notNullValue());
         //4. Вывести тело ответа на экран
-        printTheResponseBodyOnTheScreen(response);
+        printTheResponseBodyToTheScreen(response);
     }
 
 
@@ -60,8 +61,8 @@ public class CourierLoginTest {
     public void requestWithoutLoginReturnsCode404Test() {
         //1. Отправить запрос без логина
         Response response = sendRequestWithoutLogin();
-        //2. Проверить код ошибки для запроса без логина
-        checkErrorCode(response);
+        //2. Проверить, что ответ возвращается с кодом 400 Bad Request
+        theResponseIsReturnedWithCodeBadRequest(response);
         //3. Проверить текст ошибки для запроса без логина
         checkErrorText(response);
     }
@@ -77,7 +78,7 @@ public class CourierLoginTest {
         //1. Отправить запрос без пароля
         Response response = sendRequestWithoutPassword();
         //2. Проверить код ошибки для запроса без пароля
-        checkErrorCode(response);
+        theResponseIsReturnedWithCodeBadRequest(response);
         //3. Проверить текст ошибки для запроса без пароля
         checkErrorText(response);
     }
@@ -112,122 +113,6 @@ public class CourierLoginTest {
         checkTheErrorTextForARequestWithANonExistentLoginPasswordPair(response);
     }
 
-    //Создание курьера
-    @Step("Courier creation")
-    public Response courierCreation(Courier courier) {
-        Response creationResponse = given().spec(ApiSpec.getBaseSpec()).body(courier).when().post(Endpoints.COURIER);
-        return creationResponse;
-    }
-
-
-    //Метод для шага "Отправить запрос логина курьера в системе"
-    @Step("Send a request for a courier login in the system")
-    public Response sendARequestForACourierLoginInTheSystem() {
-        Response responseLogin = given().spec(ApiSpec.getBaseSpec()).body(courier).when().post(Endpoints.COURIER_LOGIN);
-        return responseLogin;
-    }
-
-
-    //Метод для шага "Проверить, что возвращается код 200"
-    @Step("Check that the code returned is 200")
-    public void checkThatTheCodeReturnedIs200(Response responseLogin) {
-        responseLogin.then().statusCode(200);
-    }
-
-
-    //Метод для шага "Вывести тело ответа на экран"
-    @Step("Print the response body on the screen")
-    public void printTheResponseBodyOnTheScreen(Response responseLogin) {
-        System.out.println(responseLogin.body().asString());
-    }
-
-
-    //Метод для шага "Получить id курьера"
-    @Step("Get courier ID")
-    public int getCourierId(Response response) {
-        return response.then().extract().path("id");
-    }
-
-
-    //Метод для шага "Отправить запрос без логина"
-    @Step("Send request without login")
-    public Response sendRequestWithoutLogin() {
-        Response response = given()
-                .spec(ApiSpec.getBaseSpec()).body(new Courier(null, "1234")).when()
-                .post(Endpoints.COURIER_LOGIN);
-        return response;
-    }
-
-
-    //Метод для шага "Отправить запрос без пароля"
-    @Step("Send request without password")
-    public Response sendRequestWithoutPassword() {
-        Response response = given().spec(ApiSpec.getBaseSpec()).body(new Courier("spider-man", null))
-                .when().post(Endpoints.COURIER_LOGIN);
-        return response;
-    }
-
-
-    //Метод для шага "Проверить код ошибки для запроса без логина или пароля"
-    @Step("Check error code")
-    public void checkErrorCode(Response response) {
-        response.then().statusCode(400);
-    }
-
-
-    //Метод для шага "Проверить текст ошибки для запроса без логина или пароля"
-    @Step("Check error text")
-    public void checkErrorText(Response response) {
-        response.then().assertThat().body("message", equalTo("Недостаточно данных для входа"));
-    }
-
-
-    //Метод для шага "Отправить запрос с некорректным логином"
-    @Step("Send request with incorrect login")
-    public Response sendRequestWithIncorrectLogin() {
-        Response response = given().spec(ApiSpec.getBaseSpec()).body(new Courier("piter-parker", "1234"))
-                .when().post(Endpoints.COURIER_LOGIN);
-        return response;
-    }
-
-
-    //Метод для шага "Отправить запрос с некорректным паролем"
-    @Step("Send request with incorrect password")
-    public Response sendRequestWithIncorrectPassword() {
-        Response response = given().spec(ApiSpec.getBaseSpec()).body(new Courier("spider-man", "4321"))
-                .when().post(Endpoints.COURIER_LOGIN);
-        return response;
-    }
-
-
-    //Метод для шага "Проверить код ответа для запроса с несуществующей парой логин-пароль"
-    @Step("Check response code for request with non-existent login-password pair")
-    public void checkResponseCodeForRequestWithNonExistentLoginPasswordPair(Response response) {
-        response.then().statusCode(404);
-    }
-
-
-    //Метод для шага "Проверить текст ошибки для запроса с несуществующей парой логин-пароль"
-    @Step("Check the error text for a request with a non-existent login-password pair")
-    public void checkTheErrorTextForARequestWithANonExistentLoginPasswordPair(Response response) {
-        response.then().assertThat().body("message", equalTo("Учетная запись не найдена"));
-    }
-
-
-    // Логин курьера в системе
-    @Step("Send a request for a courier login in the system")
-    public Response sendARequestForACourierLoginInTheSystem(Courier courier) {
-        return given().spec(ApiSpec.getBaseSpec()).body(courier).when().post(Endpoints.COURIER_LOGIN);
-    }
-
-
-    //Удаление курьера из системы
-    @Step("Courier delete")
-    public Response courierDelete(int courierId) {
-        Response responseDelete = given().spec(ApiSpec.getBaseSpec()).when().delete(Endpoints.COURIER_DELETE +
-                courierId);
-        return responseDelete;
-    }
 
     @After
     //Приведение таблицы Couriers в исходное состояние
@@ -238,7 +123,7 @@ public class CourierLoginTest {
 
         // Если код ответа 200, то получаем ID курьера и удаляем его из системы
         if (loginResponse.statusCode() == 200) {
-            courierId = getCourierId(loginResponse);
+            courierId = extractCourierIdFromResponse(loginResponse);
             Response responseDelete = courierDelete(courierId);
             responseDelete.then().statusCode(200);
         } else {

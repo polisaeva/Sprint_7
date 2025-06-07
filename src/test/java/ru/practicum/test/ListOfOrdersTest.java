@@ -12,6 +12,8 @@ import ru.practicum.Endpoints;
 import static io.restassured.RestAssured.given;
 
 import static org.hamcrest.Matchers.notNullValue;
+import static ru.practicum.ApiOrder.getTheResponseCodeAndTheListReturnedIsNotEmpty;
+import static ru.practicum.ApiOrder.sendARequestToReceiveAListOfOrders;
 
 public class ListOfOrdersTest {
 
@@ -23,16 +25,5 @@ public class ListOfOrdersTest {
         Response response = sendARequestToReceiveAListOfOrders();
         //2. Получить код ответа и убедиться в том, что список возвращается не пустой
         getTheResponseCodeAndTheListReturnedIsNotEmpty(response);
-    }
-
-    @Step("Send a request to receive a list of orders")
-    public Response sendARequestToReceiveAListOfOrders() {
-        Response response = given().spec(ApiSpec.getBaseSpec()).when().get(Endpoints.ORDER);
-        return response;
-    }
-
-    @Step("Get the response code and the list returned is not empty")
-    public void getTheResponseCodeAndTheListReturnedIsNotEmpty(Response response) {
-        response.then().statusCode(200).body("orders", notNullValue());
     }
 }

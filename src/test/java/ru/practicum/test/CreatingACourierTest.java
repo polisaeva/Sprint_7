@@ -14,6 +14,7 @@ import ru.practicum.Endpoints;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static ru.practicum.ApiCourier.*;
 
 //Создание курьера
 public class CreatingACourierTest {
@@ -100,90 +101,12 @@ public class CreatingACourierTest {
     }
 
 
-    //Метод для шага "Отправить запрос на создание курьера"
-    @Step("Send POST request to /api/v1/courier")
-    public Response sendPostRequestToCreateACourier(Courier courier) {
-        Response response = given().spec(ApiSpec.getBaseSpec()).and().body(courier).when()
-                .post(Endpoints.COURIER);
-        return response;
-    }
-
-
-    //Метод для шага "Проверить, что ответ возвращается с кодом 201 Created"
-    @Step("Check that the response is returned with code 201 Created")
-    public void theResponseIsReturnedWithCode201Created(Response response) {
-        response.then().statusCode(201);
-    }
-
-
-    //Метод для шага "Проверить сообщение в теле успешного запроса"
-    @Step("Checking the message in the response body")
-    public void checkTheMessageInTheResponseBody(Response response) {
-        response.then().assertThat().body("ok", equalTo(true));
-    }
-
-
-    //Метод для шага "Вывести тело ответа на экран"
-    @Step("Print the response body to the screen")
-    public void printTheResponseBodyToTheScreen(Response response) {
-        System.out.println(response.body().asString());
-    }
-
-
-    //Метод для шага "Проверить, что ответ возвращается с кодом 400 Bad Request"
-    @Step("Verify that the response is returned with code 400 Bad Request")
-    public void theResponseIsReturnedWithCodeBadRequest(Response response) {
-        response.then().statusCode(400);
-    }
-
-
-    //Метод для шага "Проверить сообщение в теле ответа на запрос без одного из обязательных полей"
-    @Step("Check the message in the request body without login or password")
-    public void checkTheMessageInTheRequestBodyWithoutLoginOrPassword(Response response) {
-        response.then().assertThat().body("message", equalTo("Недостаточно данных для создания учетной " +
-                "записи"));
-    }
-
-
-    //Метод для шага "Проверить, что ответ возвращается с кодом 409 Conflict"
-    @Step("Verify that the response is returned with code 409 Conflict")
-    public void theResponseIsReturnedWithCode409Conflict(Response response) {
-        response.then().statusCode(409);
-    }
-
-
-    //Метод для шага "Проверить сообщение в теле ответа на запрос с повторяющимся логином"
-    @Step("Check the message in the response body for a request with a duplicate login")
-    public void checkTheMessageInTheResponseBodyForARequestWithADuplicateLogin(Response response) {
-        response.then().assertThat().body("message", equalTo("Этот логин уже используется"));
-    }
-
-    // Логин курьера в системе
-    @Step("Send a request for a courier login in the system")
-    public Response sendARequestForACourierLoginInTheSystem(Courier courier) {
-        return given().spec(ApiSpec.getBaseSpec()).body(courier).when().post(Endpoints.COURIER_LOGIN);
-    }
-
-    @Step("Extract courier ID from login response")
-    public int extractCourierIdFromResponse(Response loginResponse) {
-        return loginResponse.then().extract().path("id");
-    }
-
-    //Удаление курьера из системы
-    @Step("Courier delete")
-    public Response courierDelete(int courierId) {
-        Response responseDelete = given().spec(ApiSpec.getBaseSpec()).when().delete(Endpoints.COURIER_DELETE +
-                courierId);
-        return responseDelete;
-    }
-
-
     @After
     @Step("Get courier id using login and password and delete courier")
     //Приведение таблицы Couriers в исходное состояние
     //Запрос возвращает правильный код ответа
     public void cleanUp() {
-        // Логин курьера в системе
+        // Отправить запрос логина курьера в системе
         Response loginResponse = sendARequestForACourierLoginInTheSystem(courier);
 
         // Если код ответа 200, то получаем ID курьера и удаляем его из системы

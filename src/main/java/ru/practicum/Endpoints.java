@@ -10,6 +10,6 @@ public class Endpoints {
 
     //Order
     public static final String ORDER = "/api/v1/orders";
-    public static final String CANSEL_ORDER = "/api/v1/orders/cancel";
+    public static final String CANCEL_ORDER = "/api/v1/orders/cancel";
 
 }
